@@ -10,9 +10,13 @@ operationsUnary.addOperator = function(name, func) {
 };
 
 operationsUnary.summonOperator = function(name, value) {
-    if(this.operators[name] === undefined) throw new Error("Operator wasn't found");
-    var main; 
     try {
+        if(this.operators[name] === undefined) throw new Error("Operator wasn't found");
+        var main;
+        
+        if (isNaN(+value) || (+value) == Infinity)
+            throw new Error("One of operands is not a number");
+        
         main = (this.operators[name])( +value );
         logOperation(main, name + " " + value + " =", main);
         updateDisplays(main);
@@ -31,26 +35,31 @@ operationsBinary.addOperator = function(name, func) {
 };
 
 operationsBinary.summonOperator = function(name, value) {
-    if(this.operators[name] === undefined) throw new Error("Operator wasn't found");
-    this.buffer.push(+value);
-    if(this.buffer.length == 2) {
-        var buffer = this.buffer[0] + " " + name + " " + this.buffer[1] + " " + "=";
-        var main; 
-        try {
+    try {
+        if(this.operators[name] === undefined) throw new Error("Operator wasn't found");
+        this.buffer.push(+value);
+        if(this.buffer.length == 2) {
+            var buffer = this.buffer[0] + " " + name + " " + this.buffer[1] + " " + "=";
+            var main; 
+            
+            if (isNaN(this.buffer[0]) || this.buffer[0] == Infinity || isNan(this.buffer[1]) || this.buffer[1] == Infinity)
+                throw new Error("One of operands is not a number");
+            
             main = (this.operators[name])( this.buffer[0], this.buffer[1] );
             logOperation(main, buffer, main);
             updateDisplays(main, buffer);
-        } catch (e) {
-            main = 0;
-            logOperation(main, "[E]: "+e+" :: "+buffer);
-            updateDisplays(main, buffer, "[E]: "+e);
+
+            this.buffer = [];
+            createCalculator.operationBuffer = undefined;
+        } else {
+            var buffer = this.buffer[0] + " " + name;
+            updateDisplays(0, buffer);
+            createCalculator.operationBuffer = name;
         }
-        this.buffer = [];
-        createCalculator.operationBuffer = undefined;
-    } else {
-        var buffer = this.buffer[0] + " " + name;
-        updateDisplays(0, buffer);
-        createCalculator.operationBuffer = name;
+    } catch (e) {
+        main = 0;
+        logOperation(main, "[E]: "+e+" :: "+buffer);
+        updateDisplays(main, buffer, "[E]: "+e);
     }
 };
 
@@ -134,12 +143,17 @@ function prepareCalc() {
         document.getElementById("calcInput").value = 0;
         document.getElementById("calcOperands").innerHTML = "";
         document.getElementById("calcError").innerHTML = "";
+        operationsBinary.buffer = [];
+        createCalculator.operationBuffer = undefined;
+        
     });
     serviceOperators.addOperator("FC", function() {
         document.getElementById("calcInput").value = 0;
         document.getElementById("calcOperands").innerHTML = "";
         document.getElementById("calcError").innerHTML = "";
         document.getElementById("calcLog").innerHTML = "";
+        operationsBinary.buffer = [];
+        createCalculator.operationBuffer = undefined;
     });
     serviceOperators.addOperator("rand", function(a) { document.getElementById("calcInput").value =  Math.random(); } );
     serviceOperators.addOperator("π", function(a) { document.getElementById("calcInput").value =  Math.PI; } );

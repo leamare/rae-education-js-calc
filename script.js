@@ -1,6 +1,6 @@
 function factorial(n) {
     if(n == 1 || n == 0) return 1;
-    else return n*factorial(n-1);
+    return n*factorial(n-1);
 }
 
 var operationsUnary = { operators: {} };
@@ -10,19 +10,19 @@ operationsUnary.addOperator = function(name, func) {
 };
 
 operationsUnary.summonOperator = function(name, value) {
+    var main;
     try {
         if(this.operators[name] === undefined) throw new Error("Operator wasn't found");
-        var main;
         
         if (isNaN(+value) || (+value) == Infinity)
             throw new Error("One of operands is not a number");
         
         main = (this.operators[name])( +value );
-        logOperation(main, name + " " + value + " =", main);
+        logOperation(main, `${name} ${value} =`, main);
         updateDisplays(main);
     } catch (e) {
         main = +value;
-        logOperation(main, "[E]: "+e + " :: " + name + " " + value + " =");
+        logOperation(main, `[E]: ${e} :: ${name} ${value} =`);
         updateDisplays(main, undefined, "[E]: "+e);
     }
 };
@@ -35,12 +35,12 @@ operationsBinary.addOperator = function(name, func) {
 };
 
 operationsBinary.summonOperator = function(name, value) {
+    var main, buffer;
     try {
         if(this.operators[name] === undefined) throw new Error("Operator wasn't found");
         this.buffer.push(+value);
         if(this.buffer.length == 2) {
-            var buffer = this.buffer[0] + " " + name + " " + this.buffer[1] + " " + "=";
-            var main; 
+            buffer = `${this.buffer[0]} ${name} ${this.buffer[1]} =`; 
             
             if (isNaN(this.buffer[0]) || this.buffer[0] == Infinity || isNaN(this.buffer[1]) || this.buffer[1] == Infinity)
                 throw new Error("One of operands is not a number");
@@ -52,13 +52,13 @@ operationsBinary.summonOperator = function(name, value) {
             this.buffer = [];
             createCalculator.operationBuffer = undefined;
         } else {
-            var buffer = this.buffer[0] + " " + name;
+            buffer = this.buffer[0] + " " + name;
             updateDisplays(0, buffer);
             createCalculator.operationBuffer = name;
         }
     } catch (e) {
         main = 0;
-        logOperation(main, "[E]: "+e+" :: "+buffer);
+        logOperation(main, `[E]: ${e} :: ${buffer}`);
         updateDisplays(main, buffer, "[E]: "+e);
     }
 };
@@ -157,81 +157,48 @@ function prepareCalc() {
     });
     serviceOperators.addOperator("rand", function(a) { document.getElementById("calcInput").value =  Math.random(); } );
     serviceOperators.addOperator("π", function(a) { document.getElementById("calcInput").value =  Math.PI; } );
+    serviceOperators.addOperator("e", function(a) { document.getElementById("calcInput").value =  Math.exp(1); } );
 }
 
 function createCalculator() {
     prepareCalc();
     
-    var el;
-    var operators = document.getElementById("calcOperators");
     var operatorsContainer;
     
     // Service Operations
-    operatorsContainer = document.createElement("div");
-    operatorsContainer.id = "calcService";
-    operatorsContainer.className = "operators-container";
-    operators.appendChild(operatorsContainer);
+    operatorsContainer = newOperatorsContainer("calcService");
     
     for (operator in serviceOperators.operators) {
-        el = document.createElement('button');
-        el.className = "operator";
-        el.innerHTML = operator;
-        el.onclick = function() { serviceOperators.summonOperator(this.innerHTML) };
-        operatorsContainer.appendChild(el);
+        newOperatorButton(operator, function() { serviceOperators.summonOperator(this.innerHTML) }, operatorsContainer);
     }
     
     // Numbers
-    operatorsContainer = document.createElement("div");
-    operatorsContainer.id = "calcNumbers";
-    operatorsContainer.className = "operators-container";
-    operators.appendChild(operatorsContainer);
+    operatorsContainer = newOperatorsContainer("calcNumbers");
     
     for (i=1; i<=10; i++) {
-        el = document.createElement('button');
-        el.className = "operator";
-        el.innerHTML = (i % 10);
-        el.onclick = function() { addDisplayNumber(this.innerHTML) };
-        operatorsContainer.appendChild(el);
+        newOperatorButton((i % 10), function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
     }
     
-    el = document.createElement('button');
-    el.className = "operator";
-    el.innerHTML = ".";
-    el.onclick = function() { addDisplayNumber(this.innerHTML) };
-    operatorsContainer.appendChild(el);
+    newOperatorButton(".", function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
     
-    el = document.createElement('button');
-    el.className = "operator";
-    el.innerHTML = "-";
-    el.onclick = function() { addDisplayNumber(this.innerHTML) };
-    operatorsContainer.appendChild(el);
+    newOperatorButton("-", function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
     
     // Binary Operators
-    operatorsContainer = document.createElement("div");
-    operatorsContainer.id = "calcBinary";
-    operatorsContainer.className = "operators-container";
-    operators.appendChild(operatorsContainer);
+    operatorsContainer = newOperatorsContainer("calcBinary");
     
     for (var operator in operationsBinary.operators) {
-        el = document.createElement('button');
-        el.className = "operator";
-        el.innerHTML = operator;
-        el.onclick = function() { operationsBinary.summonOperator(this.innerHTML, document.getElementById("calcInput").value) };
-        operatorsContainer.appendChild(el);
+        newOperatorButton(operator, function() {
+            operationsBinary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
+        }, operatorsContainer);
     }
     
     // Unary Operators
-    operatorsContainer = document.createElement("div");
-    operatorsContainer.id = "calcUnary";
-    operatorsContainer.className = "operators-container";
-    operators.appendChild(operatorsContainer);
+    operatorsContainer = newOperatorsContainer("calcUnary");
     
     for (operator in operationsUnary.operators) {
-        el = document.createElement('button');
-        el.className = "operator";
-        el.innerHTML = operator;
-        el.onclick = function() { operationsUnary.summonOperator(this.innerHTML, document.getElementById("calcInput").value) };
-        operatorsContainer.appendChild(el);
+        newOperatorButton(operator, function() {
+            operationsUnary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
+        }, operatorsContainer);
     }
 }
 createCalculator.operationBuffer = undefined;
@@ -256,7 +223,7 @@ function addDisplayNumber(num) {
 
 function updateDisplays(main, buffer, error) {
     document.getElementById("calcInput").value = main;
-    document.getElementById("calcInput").focus();
+    //document.getElementById("calcInput").focus();
     
     if(buffer !== undefined) {
         document.getElementById("calcOperands").innerHTML = buffer;
@@ -289,4 +256,24 @@ function logOperation(main, buffer, value) {
     }
     
     operationsLog.insertBefore(entry, (document.getElementsByClassName("log-entry"))[0]);
+}
+
+function newOperatorButton(name, func, parent) {
+    var el = document.createElement('button');
+    el.className = "operator";
+    el.innerHTML = name;
+    el.onclick = func;
+    
+    parent.appendChild(el);
+    
+    return el;
+}
+
+function newOperatorsContainer(name) {
+    var operatorsContainer = document.createElement("div");
+    operatorsContainer.id = name;
+    operatorsContainer.className = "operators-container";
+    document.getElementById("calcOperators").appendChild(operatorsContainer);
+    
+    return operatorsContainer;
 }

@@ -33,7 +33,7 @@
 }
 
 #calcService {
-    width: 100px;
+    width: 200px;
 }
 #calcNumbers {
     width: 300px;
@@ -109,7 +109,23 @@
     border: none;
 }
 
-@media screen and (orientation: portrait), (max-width: 768px) { 
+@media screen and (min-width: 900px) and (max-width: 1400px) { 
+    .operators-container .operator {
+        width: 75px;
+        height: 75px;
+    }
+    .operators-container {
+        margin-right: 10px;
+        width: 300px;
+    }
+    #calcService {
+        width: 151px;
+    }
+    #calcNumbers {
+        width: 226px;
+    }
+}
+@media screen and (orientation: portrait), (max-width: 900px) { 
     .operators {
         text-align: left;
     }
@@ -131,7 +147,7 @@
         width: auto;
     }
 }
-@media screen and (orientation: landscape) and (max-width: 768px) { 
+@media screen and (orientation: landscape) and (max-width: 900px) { 
     .operators-container .operator {
         width: 10%;
         height: 15vh;

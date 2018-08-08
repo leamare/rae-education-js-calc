@@ -109,7 +109,7 @@
     border: none;
 }
 
-@media screen and (min-width: 900px) and (max-width: 1400px) { 
+@media screen and (min-width: 1024px) and (max-width: 1400px) { 
     .operators-container .operator {
         width: 75px;
         height: 75px;
@@ -125,7 +125,7 @@
         width: 226px;
     }
 }
-@media screen and (orientation: portrait), (max-width: 900px) { 
+@media screen and (max-width: 1023px) { 
     .operators {
         text-align: left;
     }
@@ -147,9 +147,9 @@
         width: auto;
     }
 }
-@media screen and (orientation: landscape) and (max-width: 900px) { 
+@media screen and (orientation: landscape) and (max-width: 1023px) { 
     .operators-container .operator {
         width: 10%;
-        height: 15vh;
+        height: 10vh;
     }
 }

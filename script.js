@@ -190,6 +190,12 @@ function createCalculator() {
     el.innerHTML = ".";
     el.onclick = function() { addDisplayNumber(this.innerHTML) };
     operatorsContainer.appendChild(el);
+    
+    el = document.createElement('button');
+    el.className = "operator";
+    el.innerHTML = "-";
+    el.onclick = function() { addDisplayNumber(this.innerHTML) };
+    operatorsContainer.appendChild(el);
 }
 createCalculator.operationBuffer = undefined;
 
@@ -199,6 +205,8 @@ function addDisplayNumber(num) {
     if(num == ".") {
         if (value % 1 === 0)
             document.getElementById("calcInput").value = +(value) + ".";
+    } else if (num == "-") {
+        document.getElementById("calcInput").value = +(value) * (-1);
     } else {
         if (value == "" || value == "0")
             document.getElementById("calcInput").value = num;

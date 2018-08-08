@@ -109,7 +109,7 @@
     border: none;
 }
 
-@media screen  and (orientation: portrait) { 
+@media screen (orientation: portrait), (max-width: 768px) { 
     .operators {
         text-align: left;
     }
@@ -127,5 +127,11 @@
     }
     #calcNumbers {
         width: auto;
+    }
+}
+@media screen and (orientation: landscape) and (max-width: 768px) { 
+    .operators-container .operator {
+        width: 10%;
+        height: 15vh;
     }
 }

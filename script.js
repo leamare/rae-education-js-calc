@@ -163,25 +163,15 @@ function createCalculator() {
     prepareCalc();
     
     var el;
-    var operatorsContainer = document.getElementById("calcBinary");
-    for (var operator in operationsBinary.operators) {
-        el = document.createElement('button');
-        el.className = "operator";
-        el.innerHTML = operator;
-        el.onclick = function() { operationsBinary.summonOperator(this.innerHTML, document.getElementById("calcInput").value) };
-        operatorsContainer.appendChild(el);
-    }
+    var operators = document.getElementById("calcOperators");
+    var operatorsContainer;
     
-    operatorsContainer = document.getElementById("calcUnary");
-    for (operator in operationsUnary.operators) {
-        el = document.createElement('button');
-        el.className = "operator";
-        el.innerHTML = operator;
-        el.onclick = function() { operationsUnary.summonOperator(this.innerHTML, document.getElementById("calcInput").value) };
-        operatorsContainer.appendChild(el);
-    }
+    // Service Operations
+    operatorsContainer = document.createElement("div");
+    operatorsContainer.id = "calcService";
+    operatorsContainer.className = "operators-container";
+    operators.appendChild(operatorsContainer);
     
-    operatorsContainer = document.getElementById("calcService");
     for (operator in serviceOperators.operators) {
         el = document.createElement('button');
         el.className = "operator";
@@ -190,7 +180,12 @@ function createCalculator() {
         operatorsContainer.appendChild(el);
     }
     
-    operatorsContainer = document.getElementById("calcNumbers");
+    // Numbers
+    operatorsContainer = document.createElement("div");
+    operatorsContainer.id = "calcNumbers";
+    operatorsContainer.className = "operators-container";
+    operators.appendChild(operatorsContainer);
+    
     for (i=1; i<=10; i++) {
         el = document.createElement('button');
         el.className = "operator";
@@ -210,6 +205,34 @@ function createCalculator() {
     el.innerHTML = "-";
     el.onclick = function() { addDisplayNumber(this.innerHTML) };
     operatorsContainer.appendChild(el);
+    
+    // Binary Operators
+    operatorsContainer = document.createElement("div");
+    operatorsContainer.id = "calcBinary";
+    operatorsContainer.className = "operators-container";
+    operators.appendChild(operatorsContainer);
+    
+    for (var operator in operationsBinary.operators) {
+        el = document.createElement('button');
+        el.className = "operator";
+        el.innerHTML = operator;
+        el.onclick = function() { operationsBinary.summonOperator(this.innerHTML, document.getElementById("calcInput").value) };
+        operatorsContainer.appendChild(el);
+    }
+    
+    // Unary Operators
+    operatorsContainer = document.createElement("div");
+    operatorsContainer.id = "calcUnary";
+    operatorsContainer.className = "operators-container";
+    operators.appendChild(operatorsContainer);
+    
+    for (operator in operationsUnary.operators) {
+        el = document.createElement('button');
+        el.className = "operator";
+        el.innerHTML = operator;
+        el.onclick = function() { operationsUnary.summonOperator(this.innerHTML, document.getElementById("calcInput").value) };
+        operatorsContainer.appendChild(el);
+    }
 }
 createCalculator.operationBuffer = undefined;
 

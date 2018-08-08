@@ -1,6 +1,7 @@
 * {
     font-family: Arial, Ubuntu, sans;
     font-size: 20px;
+    margin: 0; padding: 0;
 }
 
 body {
@@ -22,15 +23,21 @@ body {
     background-color: #ddf;
 }
 
+.operators {
+    text-align: center;
+}
+
 .operators-container {
-    float: left;
+    display: inline-table;
     width: 400px;
     margin-right: 25px;
+}
+.operators-container:last-child {
+    margin-right: 0;
 }
 
 #calcService {
     width: 100px;
-    margin-right: 0;
 }
 #calcNumbers {
     width: 300px;

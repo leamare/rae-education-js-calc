@@ -14,11 +14,12 @@ operationsUnary.summonOperator = function(name, value) {
     var main; 
     try {
         main = (this.operators[name])( +value );
-        logOperation(name + " " + main);
+        logOperation(main, name + " " + value + " =", main);
         updateDisplays(main);
     } catch (e) {
         main = +value;
-        updateDisplays(main, undefined, "[E]: "+e.name);
+        logOperation(main, "[E]: "+e + " :: " + name + " " + value + " =");
+        updateDisplays(main, undefined, "[E]: "+e);
     }
 };
 
@@ -37,7 +38,7 @@ operationsBinary.summonOperator = function(name, value) {
         var main; 
         try {
             main = (this.operators[name])( this.buffer[0], this.buffer[1] );
-            logOperation(main, buffer);
+            logOperation(main, buffer, main);
             updateDisplays(main, buffer);
         } catch (e) {
             main = 0;
@@ -77,6 +78,10 @@ function prepareCalc() {
         return a % b;
     });
     operationsBinary.addOperator("^", function(a,b) { return Math.pow(a,b); });
+    operationsBinary.addOperator("a^(1/b)", function(a,b) { 
+        if (b == 0) throw new Error("Division by 0");
+        return Math.pow(a, 1/b);
+    });
     operationsBinary.addOperator("log", function(a,b) { 
         if (a == 0) throw new Error("Can't get logarithm from 0");
         if (a < 0) throw new Error("Can't get logarithm from negative number");
@@ -87,14 +92,14 @@ function prepareCalc() {
     });
     
     // Unary Operators
-    operationsUnary.addOperator("rand", function(a) { return Math.random(); } );
-    operationsUnary.addOperator("pi", function(a) { return Math.PI; } );
     operationsUnary.addOperator("exp", function(a) { return Math.exp(a); } );
-    operationsBinary.addOperator("ln", function(a,b) { 
+    operationsUnary.addOperator("ln", function(a,b) { 
         if (a == 0) throw new Error("Can't get logarithm from 0");
         if (a < 0) throw new Error("Can't get logarithm from negative number");
         return Math.log(a);
     });
+    operationsUnary.addOperator("√a", function(a) { return Math.sqrt(a); } );
+    operationsUnary.addOperator("a²", function(a) { return a*a; } );
     
     operationsUnary.addOperator("!", function(a) { return factorial(Math.trunc(a)); } );
     operationsUnary.addOperator("abs", function(a) { return Math.abs(a); } );
@@ -104,11 +109,11 @@ function prepareCalc() {
     operationsUnary.addOperator("sin", function(a) { return Math.sin(a); } );
     operationsUnary.addOperator("cos", function(a) { return Math.cos(a); } );
     operationsUnary.addOperator("tg", function(a) { 
-        if (abs(a % Math.pi) == abs(Math.pi / 2) )  throw new Error("Can't get tangent from pi/2");
+        if (Math.abs(a % Math.PI) == Math.abs(Math.PI / 2) )  throw new Error("Can't get tangent from pi/2");
         return Math.tan(a);
     } );
     operationsUnary.addOperator("ctg", function(a) { 
-        if (abs(a % Math.pi) == 0 )  throw new Error("Can't get ctangent from pi");
+        if (Math.abs(a % Math.PI) == 0 )  throw new Error("Can't get ctangent from pi");
         return 1/Math.tan(a);
     } );
     
@@ -131,6 +136,8 @@ function prepareCalc() {
         document.getElementById("calcError").innerHTML = "";
         document.getElementById("calcLog").innerHTML = "";
     });
+    serviceOperators.addOperator("rand", function(a) { document.getElementById("calcInput").value =  Math.random(); } );
+    serviceOperators.addOperator("π", function(a) { document.getElementById("calcInput").value =  Math.PI; } );
 }
 
 function createCalculator() {
@@ -163,8 +170,24 @@ function createCalculator() {
         el.onclick = function() { serviceOperators.summonOperator(this.innerHTML) };
         operatorsContainer.appendChild(el);
     }
+    
+    operatorsContainer = document.getElementById("calcNumbers");
+    for (i=1; i<=10; i++) {
+        el = document.createElement('button');
+        el.className = "operator";
+        el.innerHTML = (i % 10);
+        el.onclick = function() { addDisplayNumber(this.innerHTML) };
+        operatorsContainer.appendChild(el);
+    }
 }
 createCalculator.operationBuffer = undefined;
+
+function addDisplayNumber(num) {
+    if (document.getElementById("calcInput").value == "" || document.getElementById("calcInput").value == "0")
+        document.getElementById("calcInput").value = num;
+    else
+        document.getElementById("calcInput").value = +(document.getElementById("calcInput").value) + num;
+}
 
 function updateDisplays(main, buffer, error) {
     document.getElementById("calcInput").value = main;
@@ -184,7 +207,7 @@ function clearError() {
     document.getElementById("calcError").innerHTML = "";
 }
 
-function logOperation(main, buffer) {
+function logOperation(main, buffer, value) {
     var operationsLog = document.getElementById("calcLog");
     var entry = document.createElement('p');
     entry.className = "log-entry";
@@ -195,5 +218,10 @@ function logOperation(main, buffer) {
         entry.innerHTML = buffer + " " + main;
     }
     
-    operationsLog.appendChild(entry);
+    if(value !== undefined) {
+        entry.value = value;
+        entry.onclick = function() { updateDisplays(this.value, "Restored: " + this.innerHTML); }
+    }
+    
+    operationsLog.insertBefore(entry, (document.getElementsByClassName("log-entry"))[0]);
 }

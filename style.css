@@ -3,6 +3,10 @@
     font-size: 20px;
 }
 
+body {
+    min-width: 1300px
+}
+
 .display {
     display: block;
     line-height: 22px;
@@ -11,6 +15,88 @@
 }
 
 .display-active {
-    padding: 10px 1%;
+    padding: 15px 1%;
+    font-size: 32px;
     width: 98%;
+    border: none;
+    background-color: #ddf;
+}
+
+.operators-container {
+    float: left;
+    width: 400px;
+    margin-right: 25px;
+}
+
+#calcService {
+    width: 100px;
+    margin-right: 0;
+}
+#calcNumbers {
+    width: 300px;
+}
+
+
+.operators-container .operator {
+    width: 100px;
+    height: 100px;
+    transition: all 200ms ease;
+    border: none;
+}
+
+#calcNumbers .operator {
+    background-color: #ccc;
+}
+#calcNumbers .operator:hover {
+    background-color: #eee;
+}
+#calcNumbers .operator:active {
+    background-color: #aaa;
+}
+
+#calcBinary .operator {
+    background-color: #fb7;
+}
+#calcBinary .operator:hover {
+    background-color: #fda;
+}
+#calcBinary .operator:active {
+    background-color: #f95;
+}
+
+#calcUnary .operator {
+    background-color: #7fb;
+}
+#calcUnary .operator:hover {
+    background-color: #afd;
+}
+#calcUnary .operator:active {
+    background-color: #5f9;
+}
+
+#calcService .operator {
+    background-color: #7bf;
+}
+#calcService .operator:hover {
+    background-color: #adf;
+}
+#calcService .operator:active {
+    background-color: #59f;
+}
+
+.log {
+    clear: both;
+    background: #aaa;
+    margin-top: 20px;
+    height: 200px;
+    overflow-y: scroll;
+}
+
+.log-entry {
+    padding: 10px 7px;
+    border-bottom: 1px #777 solid;
+    margin: 0;
+}
+.log-entry:last-child {
+    border: none;
 }

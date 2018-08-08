@@ -77,6 +77,10 @@ function prepareCalc() {
         if (b == 0) throw new Error("Division by 0");
         return a % b;
     });
+    operationsBinary.addOperator("div", function(a,b) { 
+        if (b == 0) throw new Error("Division by 0");
+        return Math.trunc(a / b);
+    });
     operationsBinary.addOperator("^", function(a,b) { return Math.pow(a,b); });
     operationsBinary.addOperator("a^(1/b)", function(a,b) { 
         if (b == 0) throw new Error("Division by 0");

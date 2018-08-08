@@ -34,23 +34,38 @@ operationsBinary.addOperator = function(name, func) {
     this.buffer[name] = [];
 };
 
-operationsBinary.summonOperator = function(name, value) {
+operationsBinary.summonOperator = function(name, value, serviceMarker) {
     var main, buffer;
+    if (serviceMarker === undefined) serviceMarker = false;
     try {
         if(this.operators[name] === undefined) throw new Error("Operator wasn't found");
         this.buffer.push(+value);
         if(this.buffer.length == 2) {
-            buffer = `${this.buffer[0]} ${name} ${this.buffer[1]} =`; 
+            var operation
+            if (createCalculator.operationBuffer != name)
+                operation = createCalculator.operationBuffer;
+            else 
+                operation = name;
+            
+            buffer = `${this.buffer[0]} ${operation} ${this.buffer[1]} =`; 
             
             if (isNaN(this.buffer[0]) || this.buffer[0] == Infinity || isNaN(this.buffer[1]) || this.buffer[1] == Infinity)
                 throw new Error("One of operands is not a number");
             
-            main = (this.operators[name])( this.buffer[0], this.buffer[1] );
-            logOperation(main, buffer, main);
-            updateDisplays(main, buffer);
-
+            main = (this.operators[operation])( this.buffer[0], this.buffer[1] );
+            
             this.buffer = [];
-            createCalculator.operationBuffer = undefined;
+            if (!serviceMarker) {
+                createCalculator.operationBuffer = name;
+                this.buffer.push(main);
+                
+                logOperation(main, buffer, main);
+                updateDisplays(0, `${buffer} ${main}`);
+            } else {
+                createCalculator.operationBuffer = undefined;
+                logOperation(main, buffer, main);
+                updateDisplays(main, buffer);
+            }
         } else {
             buffer = this.buffer[0] + " " + name;
             updateDisplays(0, buffer);
@@ -60,6 +75,7 @@ operationsBinary.summonOperator = function(name, value) {
         main = 0;
         logOperation(main, `[E]: ${e} :: ${buffer}`);
         updateDisplays(main, buffer, "[E]: "+e);
+        this.buffer = [];
     }
 };
 
@@ -133,11 +149,20 @@ function prepareCalc() {
     
     // Service Operators
     serviceOperators.addOperator("=", function() {
+        var value = +(document.getElementById("calcInput").value);
         if(createCalculator.operationBuffer !== undefined) {
-            operationsBinary.summonOperator(createCalculator.operationBuffer, document.getElementById("calcInput").value);
+            operationsBinary.summonOperator(createCalculator.operationBuffer, value, true);
         } else {
-            updateDisplays( +(document.getElementById("calcInput").value), +(document.getElementById("calcInput").value) );
+            updateDisplays( value, value );
+            logOperation(value, ` = `, value);
         }
+    });
+    serviceOperators.addOperator("←", function() {
+        var len = document.getElementById("calcInput").value.length;
+        if(len == 1)
+            document.getElementById("calcInput").value = "0";
+        else 
+            document.getElementById("calcInput").value = document.getElementById("calcInput").value.substr(0, len-1);
     });
     serviceOperators.addOperator("C", function() {
         document.getElementById("calcInput").value = 0;
@@ -155,9 +180,19 @@ function prepareCalc() {
         operationsBinary.buffer = [];
         createCalculator.operationBuffer = undefined;
     });
-    serviceOperators.addOperator("rand", function(a) { document.getElementById("calcInput").value =  Math.random(); } );
-    serviceOperators.addOperator("π", function(a) { document.getElementById("calcInput").value =  Math.PI; } );
-    serviceOperators.addOperator("e", function(a) { document.getElementById("calcInput").value =  Math.exp(1); } );
+    serviceOperators.addOperator("rand", function(a) {
+        var rand = Math.random();
+        document.getElementById("calcInput").value =  rand;
+        logOperation(rand, `random = `, rand);
+    } );
+    serviceOperators.addOperator("π", function(a) {
+        document.getElementById("calcInput").value =  Math.PI;
+        logOperation(Math.PI, `π = `, Math.PI);
+    } );
+    serviceOperators.addOperator("e", function(a) {
+        document.getElementById("calcInput").value =  Math.exp(1);
+        logOperation(Math.exp(1), `e = `, Math.exp(1));
+    } );
 }
 
 function createCalculator() {
@@ -252,7 +287,7 @@ function logOperation(main, buffer, value) {
     
     if(value !== undefined) {
         entry.value = value;
-        entry.onclick = function() { updateDisplays(this.value, "Restored: " + this.innerHTML); }
+        entry.onclick = function() { updateDisplays(this.value, undefined, "Restored: " + this.innerHTML); }
     }
     
     operationsLog.insertBefore(entry, (document.getElementsByClassName("log-entry"))[0]);

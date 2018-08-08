@@ -42,7 +42,7 @@ operationsBinary.summonOperator = function(name, value) {
             var buffer = this.buffer[0] + " " + name + " " + this.buffer[1] + " " + "=";
             var main; 
             
-            if (isNaN(this.buffer[0]) || this.buffer[0] == Infinity || isNan(this.buffer[1]) || this.buffer[1] == Infinity)
+            if (isNaN(this.buffer[0]) || this.buffer[0] == Infinity || isNaN(this.buffer[1]) || this.buffer[1] == Infinity)
                 throw new Error("One of operands is not a number");
             
             main = (this.operators[name])( this.buffer[0], this.buffer[1] );

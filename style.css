@@ -109,7 +109,7 @@
     border: none;
 }
 
-@media screen (orientation: portrait), (max-width: 768px) { 
+@media screen and (orientation: portrait), (max-width: 768px) { 
     .operators {
         text-align: left;
     }
@@ -117,10 +117,12 @@
         display: flex;
         width: auto;
         margin-right: 0;
+        justify-content: center;
     }
     .operators-container .operator {
         width: 10%;
         height: 6vh;
+        flex-grow: 1;
     }
     #calcService {
         width: auto;

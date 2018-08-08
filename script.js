@@ -120,6 +120,7 @@ function prepareCalc() {
         if (Math.abs(a % Math.PI) == 0 )  throw new Error("Can't get ctangent from pi");
         return 1/Math.tan(a);
     } );
+    operationsUnary.addOperator("trunc", function(a) { return Math.trunc(a); } );
     
     // Service Operators
     serviceOperators.addOperator("=", function() {
@@ -183,14 +184,29 @@ function createCalculator() {
         el.onclick = function() { addDisplayNumber(this.innerHTML) };
         operatorsContainer.appendChild(el);
     }
+    
+    el = document.createElement('button');
+    el.className = "operator";
+    el.innerHTML = ".";
+    el.onclick = function() { addDisplayNumber(this.innerHTML) };
+    operatorsContainer.appendChild(el);
 }
 createCalculator.operationBuffer = undefined;
 
 function addDisplayNumber(num) {
-    if (document.getElementById("calcInput").value == "" || document.getElementById("calcInput").value == "0")
-        document.getElementById("calcInput").value = num;
-    else
-        document.getElementById("calcInput").value = +(document.getElementById("calcInput").value) + num;
+    var value = document.getElementById("calcInput").value;
+    
+    if(num == ".") {
+        if (value % 1 === 0)
+            document.getElementById("calcInput").value = +(value) + ".";
+    } else {
+        if (value == "" || value == "0")
+            document.getElementById("calcInput").value = num;
+        else if (value[value.length-1] == ".")
+            document.getElementById("calcInput").value = +(value) + "." + num;
+        else 
+            document.getElementById("calcInput").value = +(value) + num;
+    }
 }
 
 function updateDisplays(main, buffer, error) {

@@ -54,7 +54,6 @@ operationsBinary.summonOperator = function(name, value, serviceMarker) {
             
             main = (this.operators[operation])( this.buffer[0], this.buffer[1] );
             
-            console.log(main);
             this.buffer = [];
             if (!serviceMarker) {
                 createCalculator.operationBuffer = name;
@@ -263,7 +262,8 @@ function addDisplayNumber(num) {
 
 function updateDisplays(main, buffer, error) {
     document.getElementById("calcInput").value = main;
-    document.getElementById("calcInput").classList.add("unchanged");
+    if(!main)
+        document.getElementById("calcInput").classList.add("unchanged");
     //document.getElementById("calcInput").focus();
     
     if(buffer !== undefined) {

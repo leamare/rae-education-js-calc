@@ -41,7 +41,7 @@ operationsBinary.summonOperator = function(name, value, serviceMarker) {
         if(this.operators[name] === undefined) throw new Error("Operator wasn't found");
         this.buffer.push(+value);
         if(this.buffer.length == 2) {
-            var operation
+            var operation;
             if (createCalculator.operationBuffer != name)
                 operation = createCalculator.operationBuffer;
             else 
@@ -54,13 +54,14 @@ operationsBinary.summonOperator = function(name, value, serviceMarker) {
             
             main = (this.operators[operation])( this.buffer[0], this.buffer[1] );
             
+            console.log(main);
             this.buffer = [];
             if (!serviceMarker) {
                 createCalculator.operationBuffer = name;
                 this.buffer.push(main);
                 
                 logOperation(main, buffer, main);
-                updateDisplays(0, `${buffer} ${main}`);
+                updateDisplays("", `${buffer} ${main}`);
             } else {
                 createCalculator.operationBuffer = undefined;
                 logOperation(main, buffer, main);
@@ -68,7 +69,7 @@ operationsBinary.summonOperator = function(name, value, serviceMarker) {
             }
         } else {
             buffer = this.buffer[0] + " " + name;
-            updateDisplays(0, buffer);
+            updateDisplays("", buffer);
             createCalculator.operationBuffer = name;
         }
     } catch (e) {
@@ -223,7 +224,8 @@ function createCalculator() {
     
     for (var operator in operationsBinary.operators) {
         newOperatorButton(operator, function() {
-            operationsBinary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
+            if (!document.getElementById("calcInput").classList.contains("unchanged"))
+                operationsBinary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
         }, operatorsContainer);
     }
     
@@ -232,7 +234,8 @@ function createCalculator() {
     
     for (operator in operationsUnary.operators) {
         newOperatorButton(operator, function() {
-            operationsUnary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
+            if (!document.getElementById("calcInput").classList.contains("unchanged"))
+                operationsUnary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
         }, operatorsContainer);
     }
 }
@@ -254,10 +257,13 @@ function addDisplayNumber(num) {
         else 
             document.getElementById("calcInput").value = +(value) + num;
     }
+    
+    document.getElementById("calcInput").classList.remove("unchanged");
 }
 
 function updateDisplays(main, buffer, error) {
     document.getElementById("calcInput").value = main;
+    document.getElementById("calcInput").classList.add("unchanged");
     //document.getElementById("calcInput").focus();
     
     if(buffer !== undefined) {

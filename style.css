@@ -17,6 +17,10 @@
     width: 98%;
     border: none;
     background-color: #ddf;
+    transition: all 200ms ease;
+}
+.display-active.unchanged {
+    background-color: #ddd;
 }
 
 .operators {

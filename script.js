@@ -1,7 +1,6 @@
-function factorial(n) {
-    if(n == 1 || n == 0) return 1;
-    return n*factorial(n-1);
-}
+// =========================================================
+//      Operations handlers
+// =========================================================
 
 var operationsUnary = { operators: {} };
 
@@ -88,6 +87,10 @@ serviceOperators.addOperator = function(name, func) {
 serviceOperators.summonOperator = function(name) {
     (this.operators[name])();
 };
+
+// =========================================================
+//      Operations descriptors
+// =========================================================
 
 function prepareCalc() {
     // Binary Operators
@@ -195,83 +198,46 @@ function prepareCalc() {
     } );
 }
 
-function createCalculator() {
-    prepareCalc();
-    
-    var operatorsContainer;
-    
-    // Service Operations
-    operatorsContainer = newOperatorsContainer("calcService");
-    
-    for (operator in serviceOperators.operators) {
-        newOperatorButton(operator, function() { serviceOperators.summonOperator(this.innerHTML) }, operatorsContainer);
-    }
-    
-    // Numbers
-    operatorsContainer = newOperatorsContainer("calcNumbers");
-    
-    for (i=1; i<=10; i++) {
-        newOperatorButton((i % 10), function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
-    }
-    
-    newOperatorButton(".", function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
-    
-    newOperatorButton("-", function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
-    
-    // Binary Operators
-    operatorsContainer = newOperatorsContainer("calcBinary");
-    
-    for (var operator in operationsBinary.operators) {
-        newOperatorButton(operator, function() {
-            if (!document.getElementById("calcInput").classList.contains("unchanged"))
-                operationsBinary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
-        }, operatorsContainer);
-    }
-    
-    // Unary Operators
-    operatorsContainer = newOperatorsContainer("calcUnary");
-    
-    for (operator in operationsUnary.operators) {
-        newOperatorButton(operator, function() {
-            if (!document.getElementById("calcInput").classList.contains("unchanged"))
-                operationsUnary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
-        }, operatorsContainer);
-    }
-}
-createCalculator.operationBuffer = undefined;
+// =========================================================
+//      Service functions
+// =========================================================
 
 function addDisplayNumber(num) {
-    var value = document.getElementById("calcInput").value;
+    var calcInput = document.getElementById("calcInput");
+    var value = calcInput.value;
     
     if(num == ".") {
         if (value % 1 === 0)
-            document.getElementById("calcInput").value = +(value) + ".";
+            calcInput.value = +(value) + ".";
     } else if (num == "-") {
-        document.getElementById("calcInput").value = +(value) * (-1);
+        calcInput.value = +(value) * (-1);
     } else {
         if (value == "" || value == "0")
-            document.getElementById("calcInput").value = num;
+            calcInput.value = num;
         else if (value[value.length-1] == ".")
-            document.getElementById("calcInput").value = +(value) + "." + num;
+            calcInput.value = +(value) + "." + num;
         else 
-            document.getElementById("calcInput").value = +(value) + num;
+            calcInput.value = +(value) + num;
     }
     
-    document.getElementById("calcInput").classList.remove("unchanged");
+    calcInput.classList.remove("unchanged");
 }
 
 function updateDisplays(main, buffer, error) {
-    document.getElementById("calcInput").value = main;
+    var calcInput = document.getElementById("calcInput");
+    
+    calcInput.value = main;
     if(!main)
-        document.getElementById("calcInput").classList.add("unchanged");
-    //document.getElementById("calcInput").focus();
+        calcInput.classList.add("unchanged");
+    else
+        calcInput.classList.remove("unchanged");
     
     if(buffer !== undefined) {
-        document.getElementById("calcOperands").innerHTML = buffer;
+        calcInput.innerHTML = buffer;
     }
     
     if(error !== undefined) {
-        document.getElementById("calcError").innerHTML = error;
+        calcInput.innerHTML = error;
         setTimeout(clearError, 2000);
     }
 }
@@ -318,3 +284,69 @@ function newOperatorsContainer(name) {
     
     return operatorsContainer;
 }
+
+// =========================================================
+//      Supporting functions
+// =========================================================
+
+function factorial(n) {
+    if(n == 1 || n == 0) return 1;
+    return n*factorial(n-1);
+}
+
+// =========================================================
+//      Calculator generator
+// =========================================================
+
+function createCalculator() {
+    prepareCalc();
+    
+    var operatorsContainer;
+    
+    // Service Operations
+    operatorsContainer = newOperatorsContainer("calcService");
+    
+    for (operator in serviceOperators.operators) {
+        newOperatorButton(operator, function() { serviceOperators.summonOperator(this.innerHTML) }, operatorsContainer);
+    }
+    
+    // Numbers
+    operatorsContainer = newOperatorsContainer("calcNumbers");
+    
+    for (i=1; i<=10; i++) {
+        newOperatorButton((i % 10), function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
+    }
+    
+    newOperatorButton(".", function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
+    
+    newOperatorButton("-", function() { addDisplayNumber(this.innerHTML) }, operatorsContainer);
+    
+    // Binary Operators
+    operatorsContainer = newOperatorsContainer("calcBinary");
+    
+    for (var operator in operationsBinary.operators) {
+        newOperatorButton(operator, function() {
+            if (!document.getElementById("calcInput").classList.contains("unchanged"))
+                operationsBinary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
+        }, operatorsContainer);
+    }
+    
+    // Unary Operators
+    operatorsContainer = newOperatorsContainer("calcUnary");
+    
+    for (operator in operationsUnary.operators) {
+        newOperatorButton(operator, function() {
+            if (!document.getElementById("calcInput").classList.contains("unchanged"))
+                operationsUnary.summonOperator(this.innerHTML, document.getElementById("calcInput").value);
+        }, operatorsContainer);
+    }
+}
+createCalculator.operationBuffer = undefined;
+
+// =========================================================
+//      Event handler
+// =========================================================
+
+document.addEventListener("DOMContentLoaded", function(event) {
+    createCalculator();
+});
